@@ -1,0 +1,90 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'ui_mainwindow.ui'
+#
+# Created by: PyQt5 UI code generator 5.9.2
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.spinBox_year = QtWidgets.QSpinBox(self.centralwidget)
+        self.spinBox_year.setGeometry(QtCore.QRect(50, 10, 61, 22))
+        self.spinBox_year.setMinimum(2000)
+        self.spinBox_year.setMaximum(2100)
+        self.spinBox_year.setObjectName("spinBox_year")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(10, 20, 46, 13))
+        self.label.setObjectName("label")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(120, 20, 46, 13))
+        self.label_2.setObjectName("label_2")
+        self.spinBox_month = QtWidgets.QSpinBox(self.centralwidget)
+        self.spinBox_month.setGeometry(QtCore.QRect(170, 10, 42, 22))
+        self.spinBox_month.setMinimum(1)
+        self.spinBox_month.setMaximum(12)
+        self.spinBox_month.setObjectName("spinBox_month")
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(10, 80, 75, 23))
+        self.pushButton.setObjectName("pushButton")
+        self.spinBox_region = QtWidgets.QSpinBox(self.centralwidget)
+        self.spinBox_region.setGeometry(QtCore.QRect(300, 10, 42, 22))
+        self.spinBox_region.setMinimum(1)
+        self.spinBox_region.setMaximum(1000)
+        self.spinBox_region.setObjectName("spinBox_region")
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(250, 20, 46, 13))
+        self.label_3.setObjectName("label_3")
+        self.checkBox_updatecodes = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBox_updatecodes.setGeometry(QtCore.QRect(10, 40, 221, 17))
+        self.checkBox_updatecodes.setObjectName("checkBox_updatecodes")
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setObjectName("menubar")
+        self.menu_File = QtWidgets.QMenu(self.menubar)
+        self.menu_File.setObjectName("menu_File")
+        self.menu_Help = QtWidgets.QMenu(self.menubar)
+        self.menu_Help.setObjectName("menu_Help")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.action_Exit = QtWidgets.QAction(MainWindow)
+        self.action_Exit.setObjectName("action_Exit")
+        self.action_About = QtWidgets.QAction(MainWindow)
+        self.action_About.setObjectName("action_About")
+        self.action_Qt = QtWidgets.QAction(MainWindow)
+        self.action_Qt.setObjectName("action_Qt")
+        self.menu_File.addAction(self.action_Exit)
+        self.menu_Help.addAction(self.action_About)
+        self.menu_Help.addAction(self.action_Qt)
+        self.menubar.addAction(self.menu_File.menuAction())
+        self.menubar.addAction(self.menu_Help.menuAction())
+
+        self.retranslateUi(MainWindow)
+        self.action_Exit.triggered.connect(MainWindow.close)
+        self.action_About.triggered.connect(MainWindow.show_about_window)
+        self.action_Qt.triggered.connect(MainWindow.show_aboutqt_window)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Парсер сайта статистики ГИБДД"))
+        self.label.setText(_translate("MainWindow", "Год"))
+        self.label_2.setText(_translate("MainWindow", "Месяц"))
+        self.pushButton.setText(_translate("MainWindow", "PushButton"))
+        self.label_3.setText(_translate("MainWindow", "Регион"))
+        self.checkBox_updatecodes.setText(_translate("MainWindow", "обновить справочник кодов регионов"))
+        self.menu_File.setTitle(_translate("MainWindow", "Файл"))
+        self.menu_Help.setTitle(_translate("MainWindow", "Справка"))
+        self.action_Exit.setText(_translate("MainWindow", "Выход"))
+        self.action_About.setText(_translate("MainWindow", "О программе"))
+        self.action_Qt.setText(_translate("MainWindow", "Версия Qt"))
+

@@ -40,12 +40,18 @@ def get_latest_date():
 # по умолчанию берем самые свежие данные, за месяц перед текущим (ГИБДД выгружает данные с отставанием на 1 месяц)
 def get_rus_fed_data():
     latest_m_y = get_latest_date()
-    rf_dict = {"maptype": 1,
-               "region": "877",
-               "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"],
-                                                     latest_m_y["year"]),
-               "pok": "1"}
-    r = requests.post(URL_MainMapData, json=rf_dict)
+    # rf_dict = {"maptype": 1,
+    #            "region": "877",
+    #            "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"],
+    #                                                  latest_m_y["year"]),
+    #            "pok": "1"}
+    # # r = requests.post(URL_MainMapData, json=rf_dict)
+    # r = requests.post("http://stat.gibdd.ru/map/getMainMapData", json=rf_dict)
+
+    rf_dict = {"maptype": 1, "region": "877",
+               "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"], latest_m_y["year"]), "pok": "1"}
+    r = requests.post("http://stat.gibdd.ru/map/getMainMapData", json=rf_dict)
+
     if r.status_code != 200:
         log_text = "Не удалось получить данные по регионам РФ"
         print(log_text)
@@ -77,10 +83,16 @@ def get_regions_info():
 # по умолчанию берем самые свежие данные, за месяц перед текущим
 def get_region_data(region_id, region_name):
     latest_m_y = get_latest_date()
-    region_dict = {"maptype": 1, "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"],
-                                                                       latest_m_y["year"]), "pok": "1",
-                   "region": region_id}
-    r = requests.post(URL_MainMapData, json=region_dict)
+    # region_dict = {"maptype": 1, "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"],
+    #                                                                    latest_m_y["year"]), "pok": "1",
+    #                "region": region_id}
+    # r = requests.post(URL_MainMapData, json=region_dict)
+
+    region_dict = {"maptype": 1, "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"], latest_m_y["year"]),
+                   "pok": "1"}
+    region_dict["region"] = region_id  # region_id: string
+    r = requests.post("http://stat.gibdd.ru/map/getMainMapData", json=region_dict)
+
     if r.status_code != 200:
         log_text = "Не удалось получить статистику по региону {0} {1}".format(region_id, region_name)
         print(log_text)
@@ -269,7 +281,7 @@ def get_dtp_info(data_root, year, months, regions, region_id="0"):
 
 def create_parser():
     parser = argparse.ArgumentParser(
-        description="GibddStatParser.py [--year] [--month] [--regcode] [--dir] [--updatecodes] [--help]")
+        description="gibdd_stat_parser.py [--year] [--month] [--regcode] [--dir] [--updatecodes] [--help]")
     parser.add_argument("--year",
                         type=str,
                         help="год, за который скачивается статистика. пример: --year 2017")

@@ -82,10 +82,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Пуск</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="spinBox_region">
+   <widget class="QSpinBox" name="spinBox_regcode">
     <property name="geometry">
      <rect>
       <x>300</x>
@@ -220,9 +220,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>start_calculation()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>47</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>show_about_window()</slot>
   <slot>show_aboutqt_window()</slot>
+  <slot>start_calculation()</slot>
  </slots>
 </ui>

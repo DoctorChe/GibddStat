@@ -258,6 +258,7 @@ def get_dtp_info(data_root, year, months, regions, region_id="0"):
             dtp_dict["data"]["cards"] += cards
 
         dtp_dict_json = {"data": json.dumps(dtp_dict["data"]).encode("utf8").decode("unicode-escape")}
+        # dtp_dict_json = json.dumps(dtp_dict["data"]).encode("utf8").decode("unicode-escape")
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
         filename = os.path.join(data_dir, "{} {} {}-{}.{}.json".format(region["id"],
@@ -267,6 +268,7 @@ def get_dtp_info(data_root, year, months, regions, region_id="0"):
                                                                        year))
         with codecs.open(filename, "w", encoding="utf-8") as f:
             json.dump(dtp_dict_json, f, ensure_ascii=False, separators=(',', ':'))
+            # f.write(dtp_dict_json)
             log_text = "Сохранены данные для {} за {}-{}.{}".format(region["name"],
                                                                     months[0],
                                                                     months[len(months) - 1],

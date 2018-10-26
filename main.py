@@ -110,6 +110,19 @@ class MainWindow(QtWidgets.QMainWindow):
         #                    regions,
         #                    region_id=self.regcode)
 
+        for region in regions:
+            # была запрошена статистика по одному из регионов, а не по РФ
+            if self.regcode != "0" and region["id"] == self.regcode:
+                region_name = region["name"]
+                break
+
+        # Тест: читаем сохраненные данные ДТП
+        path = os.path.join(self.data_root, year, f"{self.regcode} {region_name} {months[0]}-{months[-1]}.{year}.json")
+        # with codecs.open(self.data_root + "\\" + str(year) + "\\41_3-3_2017.json", "r", encoding="utf-8") as f:
+        with codecs.open(path, "r", encoding="utf-8") as f:
+            json_content = json.loads(json.dumps(f.read()))
+            print(json_content)
+
 
         # if not self.ga.rдопзм:
         #     self.statusBar().showMessage('Введите исходные данные.')

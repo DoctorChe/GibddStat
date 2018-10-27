@@ -34,7 +34,30 @@ def read_dtp_data(filename):
                                                                             json_content["month_first"],
                                                                             json_content["month_last"],
                                                                             json_content["year"], len(dtp_data)))
-        print("Образец карточки ДТП: {}".format(dtp_data[0]))
+        # print("Образец карточки ДТП: {}".format(dtp_data[0]))
+
+        pog = 0
+        ran = 0
+        for dtp_data1 in dtp_data:
+            pog += int(dtp_data1["POG"])
+            ran += int(dtp_data1["RAN"])
+
+        print(f"ДТП всего {len(dtp_data)}")
+        print(f"Число погибших {pog}")
+        print(f"Число раненых {ran}")
+        print(f"Степень тяжести последствий {(ran / pog):.2f}%")
+
+        for index, dtp_data1 in enumerate(dtp_data):
+            print(
+                f"№{index} \
+                Дата - {dtp_data1['date']} \
+                ДТП Район - {dtp_data1['District']} \
+                Вид ДТП - {dtp_data1['DTP_V']} \
+                Погибло - {dtp_data1['POG']} \
+                Ранено - {dtp_data1['RAN']} \
+                Кол-во ТС - {dtp_data1['K_TS']} \
+                Кол-во уч. - {dtp_data1['K_UCH']}")
+            # print(dtp_data1)
 
 
 def main():

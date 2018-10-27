@@ -6,135 +6,208 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>823</width>
+    <height>502</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Парсер сайта статистики ГИБДД</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QSpinBox" name="spinBox_year">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>10</y>
-      <width>61</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>2000</number>
-    </property>
-    <property name="maximum">
-     <number>2100</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>46</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Год</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>20</y>
-      <width>46</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Месяц</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="spinBox_month">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>10</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>1</number>
-    </property>
-    <property name="maximum">
-     <number>12</number>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Пуск</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="spinBox_regcode">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>10</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>1</number>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>20</y>
-      <width>46</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Регион</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox_updatecodes">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>221</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>обновить справочник кодов регионов</string>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Исходные данные</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Год</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox_year">
+           <property name="minimum">
+            <number>2000</number>
+           </property>
+           <property name="maximum">
+            <number>2100</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Месяц</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_month"/>
+         </item>
+         <item>
+          <widget class="Line" name="line_5">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Регион</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_regcode"/>
+         </item>
+         <item>
+          <widget class="Line" name="line_6">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Пуск</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+      <zorder>label</zorder>
+      <zorder>horizontalLayoutWidget</zorder>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Статистика</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>ДТП всего</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_dtp_count">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Число погибших</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_dead">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Число раненых</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_inj">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Степень тяжести последствий</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_proc">
+           <property name="text">
+            <string>0.00%</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTableWidget" name="tableWidget">
+      <property name="columnCount">
+       <number>7</number>
+      </property>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>21</height>
+     <width>823</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -150,7 +223,14 @@
     <addaction name="action_About"/>
     <addaction name="action_Qt"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Сервис</string>
+    </property>
+    <addaction name="action_reload_regcodes"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -169,7 +249,18 @@
     <string>Версия Qt</string>
    </property>
   </action>
+  <action name="action_reload_regcodes">
+   <property name="text">
+    <string>Обновить справочник кодов регионов</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>spinBox_year</tabstop>
+  <tabstop>comboBox_month</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>tableWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -227,12 +318,28 @@
    <slot>start_calculation()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>47</x>
-     <y>112</y>
+     <x>756</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
      <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_reload_regcodes</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>update_codes()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>411</x>
+     <y>250</y>
     </hint>
    </hints>
   </connection>
@@ -241,5 +348,6 @@
   <slot>show_about_window()</slot>
   <slot>show_aboutqt_window()</slot>
   <slot>start_calculation()</slot>
+  <slot>update_codes()</slot>
  </slots>
 </ui>

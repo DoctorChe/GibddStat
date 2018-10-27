@@ -40,17 +40,12 @@ def get_latest_date():
 # по умолчанию берем самые свежие данные, за месяц перед текущим (ГИБДД выгружает данные с отставанием на 1 месяц)
 def get_rus_fed_data():
     latest_m_y = get_latest_date()
-    # rf_dict = {"maptype": 1,
-    #            "region": "877",
-    #            "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"],
-    #                                                  latest_m_y["year"]),
-    #            "pok": "1"}
-    # # r = requests.post(URL_MainMapData, json=rf_dict)
-    # r = requests.post("http://stat.gibdd.ru/map/getMainMapData", json=rf_dict)
-
-    rf_dict = {"maptype": 1, "region": "877",
-               "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"], latest_m_y["year"]), "pok": "1"}
-    r = requests.post("http://stat.gibdd.ru/map/getMainMapData", json=rf_dict)
+    rf_dict = {"maptype": 1,
+               "region": "877",
+               "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"],
+                                                     latest_m_y["year"]),
+               "pok": "1"}
+    r = requests.post(URL_MainMapData, json=rf_dict)
 
     if r.status_code != 200:
         log_text = "Не удалось получить данные по регионам РФ"
@@ -83,15 +78,10 @@ def get_regions_info():
 # по умолчанию берем самые свежие данные, за месяц перед текущим
 def get_region_data(region_id, region_name):
     latest_m_y = get_latest_date()
-    # region_dict = {"maptype": 1, "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"],
-    #                                                                    latest_m_y["year"]), "pok": "1",
-    #                "region": region_id}
-    # r = requests.post(URL_MainMapData, json=region_dict)
-
-    region_dict = {"maptype": 1, "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"], latest_m_y["year"]),
-                   "pok": "1"}
-    region_dict["region"] = region_id  # region_id: string
-    r = requests.post("http://stat.gibdd.ru/map/getMainMapData", json=region_dict)
+    region_dict = {"maptype": 1, "date": "[\"MONTHS:{0}.{1}\"]".format(latest_m_y["month"],
+                                                                       latest_m_y["year"]), "pok": "1",
+                   "region": region_id}
+    r = requests.post(URL_MainMapData, json=region_dict)
 
     if r.status_code != 200:
         log_text = "Не удалось получить статистику по региону {0} {1}".format(region_id, region_name)
@@ -162,7 +152,6 @@ def get_dtp_data(region_id, region_name, district_id, district_name, months, yea
 
         # cookie = {'_ga': 'GA1.2.478506347.1519754452', "_gid":"GA1.2.2037539788.1525170819", "JSESSIONID": "1B0BD20D95BB9D6462347C3D48EF8B13",
         #           "sputnik_session":"1525213652519|0"}
-        # r = requests.post("http://stat.gibdd.ru/map/getDTPCardData", json=cards_dict_json, cookies = cookie)
         r = requests.post(URL_DTPCardData, json=cards_dict_json)
         if r.status_code == 200:
             cards = json.loads(json.loads(r.content)["data"])["tab"]
@@ -211,7 +200,9 @@ def get_dtp_info(data_root, year, months, regions, region_id="0"):
         # была запрошена статистика по одному из регионов, а не по РФ
         if region_id != "0" and region["id"] != region_id:
             continue
-        if region["name"] in regions_downloaded:
+        json_file_name = f"{region_id} {region['name']} {months[0]}-{months[-1]}.{year}.json"
+        # if region["name"] in regions_downloaded:
+        if os.path.exists(os.path.join(data_root, year, json_file_name)):
             log_text = "Статистика по региону {} уже загружена".format(region["name"])
             print(log_text)
             write_log(log_text)
@@ -277,6 +268,55 @@ def get_dtp_info(data_root, year, months, regions, region_id="0"):
         # если запрошены данные только по одному региону
         if region["id"] == region_id:
             break
+
+
+def read_dtp_data(filename):
+    with codecs.open(filename, "r", encoding="utf-8") as f:
+        json_content = json.loads(json.loads(json.loads(json.dumps(f.read())))["data"])
+    dtp_data = json_content["cards"]
+    # print("Статистика ДТП по {} за {}-{}.{}. Количество ДТП: {}".format(json_content["region_name"],
+    #                                                                     json_content["month_first"],
+    #                                                                     json_content["month_last"],
+    #                                                                     json_content["year"], len(dtp_data)))
+    # print("Образец карточки ДТП: {}".format(dtp_data[0]))
+
+    pog = 0
+    ran = 0
+    for dtp_data1 in dtp_data:
+        pog += int(dtp_data1["POG"])
+        ran += int(dtp_data1["RAN"])
+
+    result = {
+        "dtp_count": str(len(dtp_data)),
+        "pog": str(pog),
+        "ran": str(ran),
+        "proc": f"{(ran / pog):.2f}%",
+        "dtp_data": {}
+        }
+
+    for index, dtp_data1 in enumerate(dtp_data):
+        result["dtp_data"][f"dtp_{index:05}"] = {}
+        result["dtp_data"][f"dtp_{index:05}"]["index"] = index
+        date = f"{dtp_data1['date'][6:]}.{dtp_data1['date'][3:5]}.{dtp_data1['date'][0:2]}"
+        result["dtp_data"][f"dtp_{index:05}"]["date"] = date
+        # result["dtp_data"][f"dtp_{index:05}"]["date"] = dtp_data1["date"]
+        result["dtp_data"][f"dtp_{index:05}"]["District"] = dtp_data1["District"]
+        result["dtp_data"][f"dtp_{index:05}"]["DTP_V"] = dtp_data1["DTP_V"]
+        result["dtp_data"][f"dtp_{index:05}"]["POG"] = dtp_data1["POG"]
+        result["dtp_data"][f"dtp_{index:05}"]["RAN"] = dtp_data1["RAN"]
+        result["dtp_data"][f"dtp_{index:05}"]["K_TS"] = dtp_data1["K_TS"]
+        result["dtp_data"][f"dtp_{index:05}"]["K_UCH"] = dtp_data1["K_UCH"]
+        # print(
+        #     f"№{index+1} \
+        #     Дата - {dtp_data1['date']} \
+        #     ДТП Район - {dtp_data1['District']} \
+        #     Вид ДТП - {dtp_data1['DTP_V']} \
+        #     Погибло - {dtp_data1['POG']} \
+        #     Ранено - {dtp_data1['RAN']} \
+        #     Кол-во ТС - {dtp_data1['K_TS']} \
+        #     Кол-во уч. - {dtp_data1['K_UCH']}")
+        # print(dtp_data1)
+    return result
 
 
 def create_parser():

@@ -14,6 +14,11 @@ from PyQt5 import QtCore
 from ui.ui_mainwindow import Ui_MainWindow
 import gibdd_stat_parser as gibdd
 
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+# from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+import matplotlib.pyplot as plt
+
+import random
 
 regions_json_filename = "regions.json"
 
@@ -43,6 +48,46 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.comboBox_month.insertItems(0, months)
 
         self.ui.comboBox_regcode.insertItems(0, self.get_combobox_regions())
+
+        # a figure instance to plot on
+        self.figure = plt.figure()
+
+        # this is the Canvas Widget that displays the `figure`
+        # it takes the `figure` instance as a parameter to __init__
+        self.canvas = FigureCanvas(self.figure)
+
+        # this is the Navigation widget
+        # it takes the Canvas widget and a parent
+        #        self.toolbar = NavigationToolbar(self.canvas, self)
+
+        # Just some button connected to `plot` method
+        # self.button.clicked.connect(self.plot)
+
+        self.ui.verticalLayout.addWidget(self.canvas)
+
+        self.plot()
+
+    def plot(self):
+        """plot some random stuff"""
+        # random data
+        data = [random.random() for _ in range(12)]
+
+        # instead of ax.hold(False)
+        self.figure.clear()
+
+        # create an axis
+        ax = self.figure.add_subplot(111)
+
+        # plot data
+        ax.plot(data, 'or-')
+
+        # label = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+        label = [str(x + 2010) for x in range(12)]
+        ax.set_xticks(range(12))
+        ax.set_xticklabels(label)
+
+        # refresh canvas
+        self.canvas.draw()
 
     def get_combobox_regions(self):
         regions = self.read_regions_from_json()
@@ -127,9 +172,11 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.regcode != "0" and region["id"] == self.regcode:
                 region_name = region["name"]
                 break
+
         path = os.path.join(self.data_root,
                             self.year,
-                            f"{self.regcode} {region_name} {months[0]}-{months[-1]}.{year}.json")
+                            f"{self.regcode} {region_name} {months[0]}-{months[-1]}.{self.year}.json")
+
         dtp_data = gibdd.read_dtp_data(path)
 
         self.ui.label_dtp_count.setText(dtp_data["dtp_count"])

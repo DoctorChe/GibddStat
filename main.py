@@ -14,11 +14,13 @@ from PyQt5 import QtCore
 from ui.ui_mainwindow import Ui_MainWindow
 import gibdd_stat_parser as gibdd
 
+import matplotlib
+matplotlib.use('agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 # from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 
-import random
+import collections
 
 regions_json_filename = "regions.json"
 
@@ -63,16 +65,12 @@ class MainWindow(QtWidgets.QMainWindow):
         # Just some button connected to `plot` method
         # self.button.clicked.connect(self.plot)
 
-        self.ui.verticalLayout.addWidget(self.canvas)
+        self.ui.verticalLayout_graph.addWidget(self.canvas)
 
-        self.plot()
+        # self.plot()
 
-    def plot(self):
-        """plot some random stuff"""
-        # random data
-        data = [random.random() for _ in range(12)]
-
-        # instead of ax.hold(False)
+    def plot(self, date, data):
+        """plot data"""
         self.figure.clear()
 
         # create an axis
@@ -82,12 +80,31 @@ class MainWindow(QtWidgets.QMainWindow):
         ax.plot(data, 'or-')
 
         # label = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-        label = [str(x + 2010) for x in range(12)]
-        ax.set_xticks(range(12))
-        ax.set_xticklabels(label)
+        label = date
+
+        # ax.set_xticks(range(12))
+        ax.set_xticks(range(len(data)))
+        # ax.set_xticklabels(label)
+        ax.set_xticklabels(x + 1 for x in range(len(data)))
 
         # refresh canvas
         self.canvas.draw()
+
+    def get_column_data(self, column):
+        data = []
+        for i in range(self.ui.tableWidget.rowCount()):
+            # print(self.ui.tableWidget.item(i, column).text())
+            data.append(self.ui.tableWidget.item(i, column).text())
+        return data
+
+    def get_dtp_number_by_date(self):
+        dates = self.get_column_data(0)
+        c = collections.Counter()
+        for date in dates:
+            c[date] += 1
+        mc = sorted(c.most_common(len(set(c))))
+        date, data = zip(*mc)
+        return date, data
 
     def get_combobox_regions(self):
         regions = self.read_regions_from_json()
@@ -201,6 +218,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.tableWidget.resizeColumnsToContents()
 
         self.ui.groupBox_2.setTitle(f"Статистика по региону: {region_name}")
+
+        date, data = self.get_dtp_number_by_date()
+        self.plot(date, data)
 
     @staticmethod
     def read_regions_from_json():

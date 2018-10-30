@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>823</width>
-    <height>502</height>
+    <width>948</width>
+    <height>674</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,8 +91,18 @@
         </layout>
        </item>
       </layout>
-      <zorder>label</zorder>
-      <zorder>horizontalLayoutWidget</zorder>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_graph">
+      <property name="title">
+       <string>Графики</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_graph"/>
+       </item>
+      </layout>
      </widget>
     </item>
     <item>
@@ -206,7 +216,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>823</width>
+     <width>948</width>
      <height>25</height>
     </rect>
    </property>

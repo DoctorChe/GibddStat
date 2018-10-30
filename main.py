@@ -13,6 +13,12 @@ from PyQt5 import QtCore
 from ui.ui_mainwindow import Ui_MainWindow
 import gibdd_stat_parser as gibdd
 
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+# from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+import matplotlib.pyplot as plt
+
+import random
+
 
 class MainWindow(QtWidgets.QMainWindow):
     """Основной класс программы"""
@@ -28,9 +34,45 @@ class MainWindow(QtWidgets.QMainWindow):
         self.month = None
         self.regcode = None
 
-        # self.parser = gibdd.create_parser()
-        # namespace = parser.parse_args(sys.argv[1:])
-        # self.namespace = self.parser.parse_args(sys.argv[1:])
+        # a figure instance to plot on
+        self.figure = plt.figure()
+
+        # this is the Canvas Widget that displays the `figure`
+        # it takes the `figure` instance as a parameter to __init__
+        self.canvas = FigureCanvas(self.figure)
+
+        # this is the Navigation widget
+        # it takes the Canvas widget and a parent
+        #        self.toolbar = NavigationToolbar(self.canvas, self)
+
+        # Just some button connected to `plot` method
+        # self.button.clicked.connect(self.plot)
+
+        self.ui.verticalLayout.addWidget(self.canvas)
+
+        self.plot()
+
+    def plot(self):
+        """plot some random stuff"""
+        # random data
+        data = [random.random() for _ in range(12)]
+
+        # instead of ax.hold(False)
+        self.figure.clear()
+
+        # create an axis
+        ax = self.figure.add_subplot(111)
+
+        # plot data
+        ax.plot(data, 'or-')
+
+        # label = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+        label = [str(x + 2010) for x in range(12)]
+        ax.set_xticks(range(12))
+        ax.set_xticklabels(label)
+
+        # refresh canvas
+        self.canvas.draw()
 
     def read_form_data(self):
         """Считывание данных с формы"""
@@ -176,6 +218,33 @@ class MainWindow(QtWidgets.QMainWindow):
     def show_aboutqt_window(self):
         """Отображение окна сведений о библиотеке Qt"""
         return QtWidgets.QMessageBox.aboutQt(self)
+
+
+# class PlotCanvas(FigureCanvas):
+# 
+#     # def __init__(self, parent=None, width=5, height=4, dpi=100):
+#     def __init__(self, fig, parent=None):
+#         # fig = Figure(figsize=(width, height), dpi=dpi)
+#         # self.axes = fig.add_subplot(111)
+#         #
+#         # FigureCanvas.__init__(self, fig)
+#         # self.setParent(parent)
+# 
+#         self.fig = fig
+#         FigureCanvas.__init__(self, self.fig)
+# 
+#         FigureCanvas.setSizePolicy(self,
+#                                    QtWidgets.QSizePolicy.Expanding,
+#                                    QtWidgets.QSizePolicy.Expanding)
+#         FigureCanvas.updateGeometry(self)
+#         self.plot()
+# 
+#     def plot(self):
+#         data = [random.random() for i in range(25)]
+#         ax = self.figure.add_subplot(111)
+#         ax.plot(data, 'r-')
+#         ax.set_title('PyQt Matplotlib Example')
+#         self.draw()
 
 
 if __name__ == "__main__":

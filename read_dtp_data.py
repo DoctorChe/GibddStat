@@ -4,6 +4,7 @@ import codecs
 import sys
 import argparse
 import os
+import matplotlib
 
 
 def create_parser():

@@ -1,5 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.6
 # -*- coding: utf-8 -*-
+
 """Парсер сайта статистики ГИБДД для сбора и анализа данных"""
 
 import sys

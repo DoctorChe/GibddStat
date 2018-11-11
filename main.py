@@ -4,14 +4,17 @@
 
 import sys
 import os
-from datetime import datetime
 import json
 import codecs
 import re
+import collections
+from datetime import datetime
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+
 # Импортируем наш интерфейс из файла
 from ui.ui_mainwindow import Ui_MainWindow
+import about_window
 import gibdd_stat_parser as gibdd
 
 import matplotlib
@@ -20,7 +23,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 # from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 
-import collections
 
 regions_json_filename = "regions.json"
 
@@ -36,7 +38,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.data_root = "dtpdata"
         self.year = ""
         self.month = ""
-        self.regcode = ""
+        self.reg_code = ""
 
         self.ui.tableWidget.setHorizontalHeaderLabels(["Дата", "ДТП Район", "Вид ДТП", "Погибло", "Ранено",
                                                        "Кол-во ТС", "Кол-во уч."])
@@ -49,10 +51,17 @@ class MainWindow(QtWidgets.QMainWindow):
         months.extend([str(x) for x in range(1, 13)])
         self.ui.comboBox_month.insertItems(0, months)
 
-        self.ui.comboBox_regcode.insertItems(0, self.get_combobox_regions())
+        if os.path.isfile(regions_json_filename):
+            self.ui.comboBox_regcode.insertItems(0, self.get_combobox_regions())
+        else:
+            msg = "Необходимо обновить справочник кодов регионов."
+            self.statusBar().showMessage(msg)
+            self.ui.pushButton.setDisabled(True)
+            self.ui.action_Start.setDisabled(True)
 
         # a figure instance to plot on
         self.figure = plt.figure()
+        # self.figure = matplotlib.pyplot.figure()
 
         # this is the Canvas Widget that displays the `figure`
         # it takes the `figure` instance as a parameter to __init__
@@ -67,28 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.verticalLayout_graph.addWidget(self.canvas)
 
-        # self.plot()
-
-    def plot(self, date, data):
-        """plot data"""
-        self.figure.clear()
-
-        # create an axis
-        ax = self.figure.add_subplot(111)
-
-        # plot data
-        ax.plot(data, 'or-')
-
-        # label = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-        label = date
-
-        # ax.set_xticks(range(12))
-        ax.set_xticks(range(len(data)))
-        # ax.set_xticklabels(label)
-        ax.set_xticklabels(x + 1 for x in range(len(data)))
-
-        # refresh canvas
-        self.canvas.draw()
+        # self.ui.pushButton.clicked.connect(self.start_calculation)
 
     def get_column_data(self, column):
         data = []
@@ -97,11 +85,25 @@ class MainWindow(QtWidgets.QMainWindow):
             data.append(self.ui.tableWidget.item(i, column).text())
         return data
 
-    def get_dtp_number_by_date(self):
+    def get_dtp_number_by_days(self):
         dates = self.get_column_data(0)
         c = collections.Counter()
         for date in dates:
             c[date] += 1
+        mc = sorted(c.most_common(len(set(c))))
+        date, data = zip(*mc)
+        return date, data
+
+    @staticmethod
+    def get_month(date):
+        _, month, _ = date.split(".")
+        return month
+
+    def get_dtp_number_by_months(self):
+        dates = self.get_column_data(0)
+        c = collections.Counter()
+        for date in dates:
+            c[self.get_month(date)] += 1
         mc = sorted(c.most_common(len(set(c))))
         date, data = zip(*mc)
         return date, data
@@ -133,7 +135,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.statusBar().showMessage(msg)
         # Регион
         try:
-            self.regcode = (re.match("([0-9]+) - (.*)", self.ui.comboBox_regcode.currentText())).group(1).strip()
+            self.reg_code = (re.match("([0-9]+) - (.*)", self.ui.comboBox_regcode.currentText())).group(1).strip()
         except ValueError:
             msg = "Регион введён не корректно."
             self.statusBar().showMessage(msg)
@@ -149,7 +151,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def start_calculation(self):
         """Основная функция программы"""
-        # pass
         self.clear_results()  # Очистить данные предыдущих вычислений
         self.read_form_data()  # Считать данные с формы
 
@@ -159,14 +160,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if not os.path.exists(gibdd.log_filename):
             gibdd.create_log()
 
-        # # получаем год (если параметр опущен - текущий год)
-        # if self.year is not None:
-        #     year = self.year
-        # else:
-        #     year = datetime.now().year
-
         # получаем месяц (если параметр опущен - все прошедшие месяцы года)
-        # if self.month is not None and self.month != "":
         if self.month:
             months = [int(self.month)]
         else:
@@ -178,21 +172,23 @@ class MainWindow(QtWidgets.QMainWindow):
         # загружаем данные из справочника ОКАТО-кодов регионов и муниципалитетов
         regions = self.read_regions_from_json()
 
+        msg = "Идёт обработка данных..."
+        self.ui.statusbar.showMessage(msg)
         gibdd.get_dtp_info(self.data_root,
                            self.year,
                            months,
                            regions,
-                           region_id=self.regcode)
+                           region_id=self.reg_code)
 
         # Тест: читаем сохраненные данные ДТП
         for region in regions:
-            if self.regcode != "0" and region["id"] == self.regcode:
+            if self.reg_code != "0" and region["id"] == self.reg_code:
                 region_name = region["name"]
                 break
 
         path = os.path.join(self.data_root,
                             self.year,
-                            f"{self.regcode} {region_name} {months[0]}-{months[-1]}.{self.year}.json")
+                            f"{self.reg_code} {region_name} {months[0]}-{months[-1]}.{self.year}.json")
 
         dtp_data = gibdd.read_dtp_data(path)
 
@@ -204,7 +200,6 @@ class MainWindow(QtWidgets.QMainWindow):
         for dtp in dtp_data["dtp_data"].values():
             row_position = self.ui.tableWidget.rowCount()
             self.ui.tableWidget.insertRow(row_position)  # insert new row
-            # self.ui.tableWidget.setItem(row_position-1, 0, QtWidgets.QTableWidgetItem(dtp["index"]))
             self.ui.tableWidget.setItem(row_position, 0, QtWidgets.QTableWidgetItem(dtp["date"]))
             self.ui.tableWidget.setItem(row_position, 1, QtWidgets.QTableWidgetItem(dtp["District"]))
             self.ui.tableWidget.setItem(row_position, 2, QtWidgets.QTableWidgetItem(str(dtp["DTP_V"])))
@@ -219,36 +214,70 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.groupBox_2.setTitle(f"Статистика по региону: {region_name}")
 
-        date, data = self.get_dtp_number_by_date()
-        self.plot(date, data)
+        if self.month:
+            date, data = self.get_dtp_number_by_days()
+            title = "Статистика ДТП по дням"
+            xlabel = "Дни"
+            ylabel = "Количество ДТП"
+            date = [x.split(".")[2].lstrip("0") for x in date]
+        else:
+            date, data = self.get_dtp_number_by_months()
+            title = "Статистика ДТП по месяцам"
+            xlabel = "Месяцы"
+            ylabel = "Количество ДТП"
+            label = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь",
+                     "Ноябрь", "Декабрь"]
+            date = label[:len(date)]
+        self.plot(date, data, title, xlabel, ylabel)
+
+        msg = "Обработка данных закончена."
+        self.ui.statusbar.showMessage(msg)
+
+    def plot(self, date, data, title="", xlabel="", ylabel=""):
+        """plot data"""
+        self.figure.clear()
+
+        # create an axis
+        ax = self.figure.add_subplot(111)
+
+        # plot data
+        ax.plot(data, 'or-')
+
+        ax.set_xticks(range(len(data)))
+        ax.set_xticklabels(date)
+
+        ax.set_title(title)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+
+        # refresh canvas
+        self.canvas.draw()
 
     @staticmethod
     def read_regions_from_json():
+        """Загрузка данных из справочника ОКАТО-кодов регионов и муниципалитетов"""
         with codecs.open(regions_json_filename, "r", "utf-8") as f:
             regions = json.loads(json.loads(json.dumps(f.read())))
         return regions
 
     @QtCore.pyqtSlot()
-    # def update_codes(self, regions_json_filename):
     def update_codes(self):
         log_text = "Обновление справочника кодов регионов..."
-        print(log_text)
         self.ui.statusbar.showMessage(log_text)
         gibdd.write_log(log_text)
         gibdd.save_code_dictionary(regions_json_filename)
+        self.ui.comboBox_regcode.insertItems(0, self.get_combobox_regions())
+        self.ui.pushButton.setDisabled(False)
+        self.ui.action_Start.setDisabled(False)
         log_text = "Обновление справочника завершено"
-        print(log_text)
         self.ui.statusbar.showMessage(log_text)
         gibdd.write_log(log_text)
 
     @QtCore.pyqtSlot()
     def show_about_window(self):
         """Отображение окна сведений о программе"""
-        return QtWidgets.QMessageBox.about(
-            self,
-            "О программе",
-            "Парсер сайта статистики ГИБДД\nдля сбора и анализа данных\n"
-            "Версия 1.0")
+        self.aboutwindow = about_window.AboutWindow()
+        self.aboutwindow.show()
 
     @QtCore.pyqtSlot()
     def show_aboutqt_window(self):

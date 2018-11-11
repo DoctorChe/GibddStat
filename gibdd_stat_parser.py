@@ -10,20 +10,9 @@ import re
 import sys
 import argparse
 
-log_filename = "parselog.log"
 URL_MainMapData = "http://stat.gibdd.ru/map/getMainMapData"
 URL_DTPCardData = "http://stat.gibdd.ru/map/getDTPCardData"
-
-
-def create_log():
-    with open(log_filename, "w") as f:
-        pass
-
-
-def write_log(text):
-    timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
-    with open(log_filename, "a") as f:
-        f.write("{} {}\n".format(timestamp, text))
+log_filename = "parselog.log"
 
 
 def get_latest_date():
@@ -122,9 +111,7 @@ def save_code_dictionary(filename):
 # шаг 3) получаем карточки ДТП по заданному региону за указанный период
 # st и en - номер первой и последней карточки, т.к. на ресурсе - постраничный перебор данных
 def get_dtp_data(region_id, region_name, district_id, district_name, months, year):
-    # if "Тюмень" in district_name:
-    #     print("debug")
-    cards_dict = {"data": {"date": ["MONTHS:1.2017"],
+    cards_dict = {"data": {"date": ["MONTHS:1.2018"],
                            "ParReg": "71100",
                            "order": {"type": "1",
                                      "fieldName": "dat"},
@@ -150,8 +137,6 @@ def get_dtp_data(region_id, region_name, district_id, district_name, months, yea
         cards_dict_json = {"data": json.dumps(cards_dict["data"],
                                               separators=(",", ":")).encode("utf8").decode("unicode-escape")}
 
-        # cookie = {'_ga': 'GA1.2.478506347.1519754452', "_gid":"GA1.2.2037539788.1525170819", "JSESSIONID": "1B0BD20D95BB9D6462347C3D48EF8B13",
-        #           "sputnik_session":"1525213652519|0"}
         r = requests.post(URL_DTPCardData, json=cards_dict_json)
         if r.status_code == 200:
             cards = json.loads(json.loads(r.content)["data"])["tab"]
@@ -229,12 +214,6 @@ def get_dtp_info(data_root, year, months, regions, region_id="0"):
             print(log_text)
             write_log(log_text)
             cards = get_dtp_data(region["id"], region["name"], district["id"], district["name"], months, year)
-            # debug
-            # if "Тюмень" in district["name"]:
-            #     for card in cards:
-            #         print("дата: {}-{}, район: {}, вид: {}, адрес: {}, {}, {}, погибло: {}, ранено: {}, кол.ТС: {}, кол. участников: {}".
-            #               format(card["date"], card["Time"], card["District"], card["DTP_V"], card["infoDtp"]["n_p"], card["infoDtp"]["street"],
-            #                      card["infoDtp"]["house"], card["POG"], card["RAN"], card["K_TS"], card["K_UCH"]))
             if cards is None:
                 continue
 
@@ -274,11 +253,6 @@ def read_dtp_data(filename):
     with codecs.open(filename, "r", encoding="utf-8") as f:
         json_content = json.loads(json.loads(json.loads(json.dumps(f.read())))["data"])
     dtp_data = json_content["cards"]
-    # print("Статистика ДТП по {} за {}-{}.{}. Количество ДТП: {}".format(json_content["region_name"],
-    #                                                                     json_content["month_first"],
-    #                                                                     json_content["month_last"],
-    #                                                                     json_content["year"], len(dtp_data)))
-    # print("Образец карточки ДТП: {}".format(dtp_data[0]))
 
     pog = 0
     ran = 0
@@ -299,23 +273,12 @@ def read_dtp_data(filename):
         result["dtp_data"][f"dtp_{index:05}"]["index"] = index
         date = f"{dtp_data1['date'][6:]}.{dtp_data1['date'][3:5]}.{dtp_data1['date'][0:2]}"
         result["dtp_data"][f"dtp_{index:05}"]["date"] = date
-        # result["dtp_data"][f"dtp_{index:05}"]["date"] = dtp_data1["date"]
         result["dtp_data"][f"dtp_{index:05}"]["District"] = dtp_data1["District"]
         result["dtp_data"][f"dtp_{index:05}"]["DTP_V"] = dtp_data1["DTP_V"]
         result["dtp_data"][f"dtp_{index:05}"]["POG"] = dtp_data1["POG"]
         result["dtp_data"][f"dtp_{index:05}"]["RAN"] = dtp_data1["RAN"]
         result["dtp_data"][f"dtp_{index:05}"]["K_TS"] = dtp_data1["K_TS"]
         result["dtp_data"][f"dtp_{index:05}"]["K_UCH"] = dtp_data1["K_UCH"]
-        # print(
-        #     f"№{index+1} \
-        #     Дата - {dtp_data1['date']} \
-        #     ДТП Район - {dtp_data1['District']} \
-        #     Вид ДТП - {dtp_data1['DTP_V']} \
-        #     Погибло - {dtp_data1['POG']} \
-        #     Ранено - {dtp_data1['RAN']} \
-        #     Кол-во ТС - {dtp_data1['K_TS']} \
-        #     Кол-во уч. - {dtp_data1['K_UCH']}")
-        # print(dtp_data1)
     return result
 
 
@@ -343,18 +306,15 @@ def create_parser():
     return parser
 
 
-# def get_param_splitted(param, command_name):
-#     splitted_list = []
-#     splitted = param.split("-")
-#     try:
-#         splitted_list.append(int(splitted[0]))
-#         if len(splitted) == 2:
-#             splitted_list.append(int(splitted[1]))
-#     except:
-#         log_text = "Неверное значение параметра {}".format(command_name)
-#         print(log_text)
-#         write_log(log_text)
-#     return splitted_list
+def create_log():
+    with open(log_filename, "w") as f:
+        pass
+
+
+def write_log(text):
+    timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
+    with open(log_filename, "a") as f:
+        f.write("{} {}\n".format(timestamp, text))
 
 
 def main():
@@ -408,14 +368,9 @@ def main():
                  regions,
                  region_id=namespace.regcode)
 
-    # Тест: читаем сохраненные данные ДТП
-    # with codecs.open(data_root + "\\" + str(year) + "\\41_3-3_2017.json", "r", encoding="utf-8") as f:
-    #     json_content = json.loads(json.dumps(f.read()))
-    #     print (json_content)
-
 
 # для вызова скрипта из командной строки
 if __name__ == "__main__":
-    log_text = "Загрузчик данных по ДТП ГИБДД РФ"
+    log_text = "Парсер сайта статистики ГИБДД"
     print(log_text)
     main()

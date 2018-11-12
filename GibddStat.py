@@ -146,9 +146,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_dead.setText("0")
         self.ui.label_inj.setText("0")
         self.ui.label_proc.setText("0.00%")
-        # self.ui.tableWidget.setRowCount(0)
-        for row in reversed(range(self.ui.tableWidget.rowCount())):
-            self.ui.tableWidget.removeRow(row)
+        self.ui.tableWidget.setRowCount(0)
+        # for row in reversed(range(self.ui.tableWidget.rowCount())):
+        #     self.ui.tableWidget.removeRow(row)
 
     def start_calculation(self):
         """Основная функция программы"""
@@ -197,6 +197,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_dead.setText(dtp_data["pog"])
         self.ui.label_inj.setText(dtp_data["ran"])
         self.ui.label_proc.setText(dtp_data["proc"])
+
+        self.ui.tableWidget.setSortingEnabled(False)
 
         for dtp in dtp_data["dtp_data"].values():
             row_position = self.ui.tableWidget.rowCount()

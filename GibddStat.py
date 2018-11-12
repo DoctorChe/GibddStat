@@ -31,7 +31,7 @@ regions_json_filename = "regions.json"
 class MainWindow(QtWidgets.QMainWindow):
     """Основной класс программы"""
 
-    def __init__(self, iniFile, parent=None):
+    def __init__(self, parent=None):
         QtWidgets.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -289,8 +289,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-    # QApplication.setDesktopSettingsAware(False)
     app = QtWidgets.QApplication(sys.argv)  # pylint: disable=invalid-name
-    myapp = MainWindow("last_values.ini")
+    myapp = MainWindow()
     myapp.show()
     sys.exit(app.exec_())
